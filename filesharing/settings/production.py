@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'core',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -118,7 +121,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),'static/')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT =  os.path.join(os.path.dirname(BASE_DIR),'media/')
 
+ACCOUNT_ACTIVATION_DAYS = 7
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
