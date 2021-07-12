@@ -46,6 +46,8 @@ class DetailView(LoginRequiredMixin, TemplateView):
                 file = None
 
         context['file'] = file
+        if file:
+            context["comment_perm"] = file.has_perm_comment(user)
         return context
 
 class RegistrationView(BaseRegistrationView):

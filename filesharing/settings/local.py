@@ -42,6 +42,8 @@ INSTALLED_APPS = [
 
     'core',
     'rest_framework',
+
+    'channels'
     
 ]
 
@@ -146,3 +148,15 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
+
+
+# Channels
+ASGI_APPLICATION = "filesharing.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get("REDIS_URL", "redis://localhost:6379")],
+        },
+    },
+}

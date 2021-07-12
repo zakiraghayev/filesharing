@@ -20,7 +20,7 @@ class Comments(models.Model):
     text  = models.TextField()
 
     def __str__(self):
-        return "Comment by"+self.owner.username
+        return "Comment by "+self.owner.username
        
 
 

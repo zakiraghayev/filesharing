@@ -2,24 +2,91 @@
 <!-- {# Loading the template tag #} -->
 
 {% block body %}
-    {% if file %}
-    <div class="media text-muted pt-3">
-        <a href="/media/{{file.file}}">
-            <img src="/static/core/img/file.png" style="width:35px; height:35px;" alt="" class="mr-2 rounded">
-        </a>
-        <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+{% if file %}
+<div class="media text-muted pt-3">
+    <a href="/media/{{file.file}}">
+        <img src="/static/core/img/file.png" style="width:35px; height:35px;" alt="" class="mr-2 rounded">
+    </a>
+    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
         <strong class="d-block text-gray-dark">{{file.name}}</strong>
         @{{file.username}}
-        <br/><br/>
+        <br /><br />
         {{file.desc}}
-        </p>
+    </p>
 
-    </div>
-    {% else %}
-        <div class="alert alert-danger" > Either you don't have access to File with the ID or there is no File with the ID. Try again </div>
-    {% endif %}
-    <!-- {# Render all the comments belong to the passed object "obj" #} -->
-    {% if file %}
+</div>
+{% else %}
+<div class="alert alert-danger"> Either you don't have access to File with the ID or there is no File with the ID. Try
+    again </div>
+{% endif %}
+<!-- {# Render all the comments belong to the passed object "obj" #} -->
+
+{% if file %}
+
+{% if comment_perm %}
+<!-- What chat room would you like to enter?<br> -->
+<div class="form-group row">
+
+    <input id="chat-message-input" class="form-control col-10" type="text" size="100"><br>
+    <input id="chat-message-submit" class="col btn btn-primary" clas type="button" value="Comment">
+</div>
+
+<script>
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + '{{file.id}}'
+        + '/'
+    );
+
+    chatSocket.onopen = function (e) {
+        console.log("On Open. ")
+    }
+
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        console.log(data, "Chat")
+        document.querySelector('#chat-log').innerHTML += 
+        `<li class="list-group-item d-flex justify-content-between align-items-center">
+            `+ data.message +`
+            <span class="badge badge-primary badge-pill">` + data.username +` </span>
+         </li>
+        `
+        
+        
+    };
+
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function (e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function (e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message
+        }));
+        messageInputDom.value = '';
+    };
+</script>
+{% endif %}
+<ul class="list-group" id="chat-log">
+    {% for c in file.comments.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{c.text |default:'No message inputed ?!'}}
+        <span class="badge badge-primary badge-pill">{{c.owner}}</span>
+        </li>
+    {% endfor %}
     
-    {% endif %}
+  </ul>
+{% endif %}
 {% endblock %}
