@@ -36,18 +36,17 @@ class DetailView(LoginRequiredMixin, TemplateView):
         file = None
         try:
             file = get_object_or_404(user.myfiles, pk=pk)
-        
+            context["comment_perm"] = True
         except:
             try:
                 files = FileContainer.objects.filter(permissions__in =  user.myperm.all())
                 file = files.get(pk=pk)
+                context["comment_perm"] = file.has_perm_comment(user)
 
             except:
                 file = None
 
         context['file'] = file
-        if file:
-            context["comment_perm"] = file.has_perm_comment(user)
         return context
 
 class RegistrationView(BaseRegistrationView):

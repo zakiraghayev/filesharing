@@ -55,7 +55,7 @@ class FileContainer(models.Model):
          else can view or no access at all"""
         try:
             perm = self.permissions.get(user=user)
-            return perm.perm
+            return perm.perm or self.owner == user
         except:
             return False
 
