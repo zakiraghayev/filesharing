@@ -1,0 +1,273 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>File2Share</title>
+
+    <style>
+        html,
+      body {
+        overflow-x: hidden; /* Prevent scroll on narrow devices */
+      }
+
+      body {
+        padding-top: 56px;
+      }
+
+      @media (max-width: 767.98px) {
+        .offcanvas-collapse {
+          position: fixed;
+          top: 56px; /* Height of navbar */
+          bottom: 0;
+          width: 100%;
+          padding-right: 1rem;
+          padding-left: 1rem;
+          overflow-y: auto;
+          background-color: var(--gray-dark);
+          transition: -webkit-transform .3s ease-in-out;
+          transition: transform .3s ease-in-out;
+          transition: transform .3s ease-in-out, -webkit-transform .3s ease-in-out;
+          -webkit-transform: translateX(100%);
+          transform: translateX(100%);
+        }
+        .offcanvas-collapse.open {
+          -webkit-transform: translateX(-1rem);
+          transform: translateX(-1rem); /* Account for horizontal padding on navbar */
+        }
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: nowrap;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        color: rgba(255, 255, 255, .75);
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .nav-underline .nav-link {
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+        font-size: .875rem;
+        color: var(--secondary);
+      }
+
+      .nav-underline .nav-link:hover {
+        color: var(--blue);
+      }
+
+      .nav-underline .active {
+        font-weight: 500;
+        color: var(--gray-dark);
+      }
+
+      .text-white-50 { color: rgba(255, 255, 255, .5); }
+
+      .bg-purple { background-color: var(--purple); }
+
+      .border-bottom { border-bottom: 1px solid #e5e5e5; }
+
+      .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+
+      .lh-100 { line-height: 1; }
+      .lh-125 { line-height: 1.25; }
+      .lh-150 { line-height: 1.5; }
+    </style>
+  </head>
+  <body class="bg-light">
+
+    <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">File Share</a>
+      <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Dashboard <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Notifications</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Switch account</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+          </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+          <a href="{% url 'logout' %}" class="btn btn-outline-danger my-2 my-sm-0" type="submit">Exit</a>
+        </form>
+      </div>
+    </nav>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+        {% endfor %}
+    </ul>
+    {% endif %}
+  
+    <main role="main" class="container">
+      <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded box-shadow">
+        <img class="mr-3" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-outline.svg" alt="" width="48" height="48">
+        <div class="lh-100 col-10">
+          <h6 class="mb-0 text-white lh-100">FileSharing</h6>
+          <small>Since 2011</small>
+        </div>
+        
+        <button class="btn btn-ourline-success p-2" data-toggle="modal" data-target="#uploadFile">  Upload </button>
+
+      </div>
+
+      <div class="my-3 p-3 bg-white rounded box-shadow" id="">
+        <h6 class="border-bottom border-gray pb-2 mb-0">Share with me</h6>
+        <div id=filesplace>
+
+        </div>
+        <small class="d-block text-right mt-3">
+          <a id="morefiles" href="javascript:;"  data-url="/api/files/" onclick="sharedwithme(this)">More Files</a>
+        </small>
+      </div>
+
+      <div class="my-3 p-3 bg-white rounded box-shadow">
+        <h6 class="border-bottom border-gray pb-2 mb-0">My files</h6>
+        <div id="myfiles">
+
+        </div>
+        
+        <small class="d-block text-right mt-3">
+          <a id="moremyfiles" href="javascript:;"  data-url="/api/files/myfiles/" onclick="myfiles(this)">More Files</a>
+        </small>
+      </div>
+    </main>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://getbootstrap.com/docs/4.0/assets/js/vendor/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://getbootstrap.com/docs/4.0/assets/js/vendor/holder.min.js"></script>
+    
+    <!-- Handlebars -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js" integrity="sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{% static '/core/index.js' %}"></script>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              {%csrf_token%}
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">File ID:</label>
+                <input type="text" disabled class="form-control" name="file" id="recipient-name">
+                
+                <label for="recipient-user" class="col-form-label">Share with:</label>
+                <input type="text" required class="form-control" name="user" placeholder="username" id="recipient-user">
+                
+                <label for="recipient-perm" class="col-form-label">Permission:</label>
+                <select id="recipient-perm" class="form-control" name="user">
+                  <option value="0"> Can view </option>
+                  <option value="1"> Can view and comment </option>
+                </select>
+              </div>
+              
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" id="sharebtn" class="btn btn-primary" onclick="shareWith(event);">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      //  Modal
+      $('#exampleModal').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var recipient = button.data('whatever') // Extract info from data-* attributes
+          // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+          // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+          var modal = $(this)
+          modal.find('.modal-title').text('Share your file.')
+          modal.find('.modal-body #recipient-name').val(recipient)
+          modal.find('#sharebtn').text("Share");
+        })
+    </script>
+
+    <!-- Modal -->
+    <div class="modal fade" id="uploadFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Upload Your File</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="file-name" class="col-form-label"> File Name:</label>
+                <input type="text" class="form-control" name="name" id="file-name" >
+
+                <label for="file-desc" class="col-form-label"> Desc:</label>
+                <input type="text" class="form-control" name="desc" id="file-desc">
+
+                <label for="file-file" class="col-form-label"> File:</label>
+                <input type="file" class="form-control" name="file" id="file-file">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="upload(event)">Upload</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
