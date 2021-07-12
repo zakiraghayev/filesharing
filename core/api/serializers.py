@@ -48,3 +48,11 @@ class PermTypeSerializer(serializers.ModelSerializer):
         perm.perm =  validated_data.get("perm")
         perm.save()
         return validated_data
+
+class CommentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = FileContainer
+        fields = ["owner", "text"]
+    
+   

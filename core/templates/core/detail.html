@@ -1,5 +1,8 @@
 {% extends "core/base.html" %}
+<!-- {# Loading the template tag #} -->
+
 {% block body %}
+    {% if file %}
     <div class="media text-muted pt-3">
         <a href="/media/{{file.file}}">
             <img src="/static/core/img/file.png" style="width:35px; height:35px;" alt="" class="mr-2 rounded">
@@ -12,4 +15,11 @@
         </p>
 
     </div>
+    {% else %}
+        <div class="alert alert-danger" > Either you don't have access to File with the ID or there is no File with the ID. Try again </div>
+    {% endif %}
+    <!-- {# Render all the comments belong to the passed object "obj" #} -->
+    {% if file %}
+    
+    {% endif %}
 {% endblock %}

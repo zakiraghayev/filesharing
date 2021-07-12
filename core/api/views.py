@@ -1,7 +1,9 @@
+from django.db.models import fields
+from core.models import FileContainer
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, response, permissions, decorators
 from rest_framework import serializers
-from rest_framework.serializers import Serializer
-from .serializers import FileContainerSerializer, PermTypeSerializer
+from .serializers import FileContainerSerializer, PermTypeSerializer, CommentSerializer
 
 # Views API
 
@@ -40,3 +42,13 @@ class FileContainerApi(viewsets.ModelViewSet):
         if self.action == "shareWith":
             return PermTypeSerializer
         return super().get_serializer_class()
+
+class CommentsAPI(viewsets.ViewSet):
+
+    def get(self, request, pk=None):
+        myperm = request.user.myperm.filter(perm=True)
+        file = get_object_or_404(FileContainer.objects.filter(permissions__in = myperm)\
+            , pk=pk)
+        data = CommentSerializer(file.comments.all(), many=True).data
+        return response.Response(data)
+        
