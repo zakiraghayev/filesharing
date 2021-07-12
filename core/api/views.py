@@ -1,5 +1,7 @@
 from rest_framework import viewsets, response, permissions, decorators
-from .serializers import FileContainerSerializer, FileContainer
+from rest_framework import serializers
+from rest_framework.serializers import Serializer
+from .serializers import FileContainerSerializer, PermTypeSerializer
 
 # Views API
 
@@ -23,3 +25,18 @@ class FileContainerApi(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return response.Response(serializer.data)
+    
+    @decorators.action(detail=True, methods=['post'])
+    def shareWith(self, request, pk=None):
+        print(request.data)
+        serializer = self.get_serializer_class()(data=request.data, \
+            context={"request":request, "file":pk}, many=False)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data)
+        return response.Response(serializer.errors)
+
+    def get_serializer_class(self):
+        if self.action == "shareWith":
+            return PermTypeSerializer
+        return super().get_serializer_class()

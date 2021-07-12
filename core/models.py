@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from rest_framework import permissions
 
 from .utils import *
 # Create your models here.

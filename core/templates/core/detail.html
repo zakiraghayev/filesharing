@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+{% block body %}
+    <div class="media text-muted pt-3">
+        <a href="/media/{{file.file}}">
+            <img src="/static/core/img/file.png" style="width:35px; height:35px;" alt="" class="mr-2 rounded">
+        </a>
+        <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+        <strong class="d-block text-gray-dark">{{file.name}}</strong>
+        @{{file.username}}
+        <br/><br/>
+        {{file.desc}}
+        </p>
+
+    </div>
+{% endblock %}
