@@ -55,6 +55,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         file = get_object_or_404(FileContainer, pk=self.context['pk'])
         perm = file.has_perm_comment(user)
+        print(perm)
         if perm :
             file.comments.create(owner=user, text=msg)
         

@@ -57,7 +57,7 @@ class FileContainer(models.Model):
             perm = self.permissions.get(user=user)
             return perm.perm or self.owner == user
         except:
-            return False
+            return False or self.owner == user
 
     def comment(self, user, text):
         if self.has_perm_comment(user):

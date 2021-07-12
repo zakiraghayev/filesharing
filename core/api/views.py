@@ -1,6 +1,6 @@
 from django.db.models import fields
 from core.models import FileContainer
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework import viewsets, response, permissions, decorators
 from rest_framework import serializers
 from .serializers import FileContainerSerializer, PermTypeSerializer, CommentSerializer
@@ -15,7 +15,9 @@ class FileContainerApi(viewsets.ModelViewSet):
     def get_queryset(self):
         """ Returns shared files """
         myperms = self.request.user.myperm.all()
-        return [f.filesshared.first() for f in myperms]
+        return get_list_or_404(FileContainer, permissions__in = myperms)
+
+        #  [f.filesshared.first() for f in myperms]
     
     @decorators.action(detail=False, methods=['get'])
     def myfiles(self, request):
@@ -30,7 +32,6 @@ class FileContainerApi(viewsets.ModelViewSet):
     
     @decorators.action(detail=True, methods=['post'])
     def shareWith(self, request, pk=None):
-        print(request.data)
         serializer = self.get_serializer_class()(data=request.data, \
             context={"request":request, "file":pk}, many=False)
         if serializer.is_valid():
@@ -46,9 +47,38 @@ class FileContainerApi(viewsets.ModelViewSet):
 class CommentsAPI(viewsets.ViewSet):
 
     def get(self, request, pk=None):
+        """ pk is files pk """
         myperm = request.user.myperm.filter(perm=True)
         file = get_object_or_404(FileContainer.objects.filter(permissions__in = myperm)\
             , pk=pk)
-        data = CommentSerializer(file.comments.all(), many=True).data
+        data = CommentSerializer(file.comments.filter(owner=request.user), many=True).data
         return response.Response(data)
-        
+    
+    def cmdetail(self, request, pk=None):
+        """ pk is files pk """
+        try:
+            comment = get_object_or_404(request.user.mycomments.all(), pk=pk)
+            data = CommentSerializer(comment, many=False).data
+            return response.Response(data)
+        except:
+            return response.Response({})
+            
+    def update(self, request, pk=None):
+        """ pk is comment pk"""
+        comment = get_object_or_404(request.user.mycomments.all(), pk=pk)
+        data = {"owner":request.user.pk, "text":request.data.get("text", comment.text)}
+        serializer = CommentSerializer(data=data, instance=comment, many=False)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data)
+        return response.Response(serializer.errors)
+
+    def delete(self, request, pk=None):
+        """ pk is comment pk"""
+        try:
+            comment = get_object_or_404(request.user.mycomments.all(), pk=pk)
+        except:
+            file = get_object_or_404(request.user.myfiles.all(), comments__in = [pk])
+            comment = get_object_or_404(file.comments.all(), pk=pk)
+        comment.delete()
+        return response.Response({"status":"Comment deleted"})

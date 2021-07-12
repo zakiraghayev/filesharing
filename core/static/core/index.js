@@ -132,6 +132,54 @@ function upload(event) {
     request.send(data)
 }
 
+function editcommentbtn(id, action=false) {
+    if (action) {
+        document.querySelector("#cm_"+id).type = "hidden";
+        document.querySelector("#cmc_"+id).type = "hidden";
+        document.querySelector("#edit_"+id).onclick = ()=>{
+            editcommentbtn(id)
+        }
+    }
+    else {
+        document.querySelector("#cm_"+id).type = "text";
+        document.querySelector("#cmc_"+id).type = "button";
+        document.querySelector("#edit_"+id).onclick = ()=>{
+            commentmanager(`${id}`)
+        }
+    }
+    
+    
+}
+
+function commentmanager(cmid=false, method="PUT", message=false) {
+    if (!cmid)  return
+    
+    const request = new XMLHttpRequest();
+    let csrf = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+    // make request
+    request.open(method, "/api/comments/"+cmid+"/")
+    request.setRequestHeader("X-CSRFToken", csrf)
+    // Get reqult of request made
+    request.onload = ()=>{
+        let response = JSON.parse(request.responseText)
+        console.log(response)
+        if (request.status == 200) {
+            window.location.reload()
+        } else {
+            editcommentbtn(cmid, "cancel")
+        }
+    }
+
+    const data = new FormData();
+    if (method == "PUT") {
+        message=document.querySelector("#cm_"+cmid).value;
+        data.append("text", message)
+    }
+    // Send request
+    request.send(data)
+
+}
 let blueHTML = `
             {{#each files}}
                 <div class="media text-muted pt-3">
@@ -164,7 +212,13 @@ let myfilesHTML = `
             {{/each}}`
 // Start onload
 document.addEventListener("DOMContentLoaded", ()=>{
-    document.getElementById("morefiles").click();
-    document.getElementById("moremyfiles").click();
+
+    try {
+        document.getElementById("morefiles").click();
+        document.getElementById("moremyfiles").click();
+    } catch (error) {
+        
+    }
+
  })
 

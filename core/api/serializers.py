@@ -6,7 +6,7 @@ from django.contrib import messages
 
 # import rest framework
 from rest_framework import fields, serializers
-
+from core.models import Comments
 
 class FileContainerSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
@@ -40,10 +40,12 @@ class PermTypeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         uname = validated_data.get("user")['username']
-        
+        if "@" in uname:
+            share2whom = get_object_or_404(User, email=uname)
+        else:
+            share2whom = get_object_or_404(User, username=uname)
         owner = self.context['request'].user
         file2share = get_object_or_404(owner.myfiles.all(), pk=self.context['file'])
-        share2whom = get_object_or_404(User, username=uname)
         perm, _ = file2share.permissions.get_or_create(user = share2whom)
         perm.perm =  validated_data.get("perm")
         perm.save()
@@ -52,7 +54,7 @@ class PermTypeSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = FileContainer
+        model = Comments
         fields = ["owner", "text"]
     
    

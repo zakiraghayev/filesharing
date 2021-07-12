@@ -7,5 +7,6 @@ router.register(r'files', FileContainerApi, basename='files')
 urlpatterns = router.urls
 
 urlpatterns += [
-    path("filecomments/<int:pk>", CommentsAPI.as_view({"get":"get"}), name="comments")
+    path("filecomments/<int:pk>", CommentsAPI.as_view({"get":"get"}), name="comments"),
+    path("comments/<int:pk>/", CommentsAPI.as_view({"get":"cmdetail", "put":"update", "delete":"delete"}), name="comments-detail"),
 ]

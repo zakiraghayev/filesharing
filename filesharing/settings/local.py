@@ -137,7 +137,7 @@ MEDIA_ROOT =  os.path.join(os.path.dirname(BASE_DIR),'media/')
 ACCOUNT_ACTIVATION_DAYS = 7
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 1
+    'PAGE_SIZE': 4
 }
 
 
