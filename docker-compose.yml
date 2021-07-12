@@ -1,47 +1,62 @@
-version: "3.9"
+version: '3'
+
 services:
-
-  # Redis
+  
   redis:
-    image: redis:alpine
-    container_name: redis
-
-  # Database Postgres
-  db:
-    image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    container_name: postgres_db
-
-  # Django Application
-  app:
-    build: .
-    volumes:
-      - .:/django
+    image: "redis:alpine"
     ports:
-      - 8000:8000
-    image: app:django
-    container_name: django_app
-    # command: python manage.py runserver 0.0.0.0:8000
-    command: daphne -b 0.0.0.0 -p 8000 filesharing.asgi:channel_layer
+      - "6379:6379"
 
-    depends_on:
-      - db 
-      
-  # Celery
-  celery:
-    restart: always
+  db:
+    # restart: always
+    image: postgres:latest
+    environment: 
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+        - pgdata:/var/lib/postgresql/data/
+  migration:
+      build: .
+      command:  bash -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic"
+      depends_on: 
+        - db
+
+  web:
+    # restart: always
+    build: .
+    ports:
+      - "8000:8000"
+    links:
+      - db:db
+      - redis:redis
+
+    
+    volumes:
+      - /static:/static
+      - media:/media
+    env_file: .env
+    command: python manage.py runserver 0.0.0.0:8000
+
+    depends_on: 
+      - migration
+      - db
+
+  worker:
     build:
       context: .
-    command: celery -A filesharing worker -l DEBUG
+      dockerfile: Dockerfile
+    image: madefire/chordtest
+    command: bash -c "celery -A filesharing worker -l INFO"
+    environment:
+      - BROKER_URL=redis://redis:6379/0
+      - RESULT_BACKEND=redis://redis:6379/0
+      - C_FORCE_ROOT=true
     volumes:
-      - .:/django
-    container_name: celery
+      - ./:/app/
     depends_on:
-      - db
-      - redis
-      - app
+      - redis 
+
+ 
+
+volumes:
+  media:
+  pgdata:
