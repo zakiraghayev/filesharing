@@ -6,4 +6,6 @@ ADD . /django
 COPY requirements.txt requirements.txt
 RUN python -m pip install -r requirements.txt
 
+RUN pip install -U 'Twisted[tls,http2]'
+
 COPY . .
