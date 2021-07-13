@@ -1,9 +1,11 @@
 build:
   docker:
     web: Dockerfile
+    # db : Dockerfile
 run:
   web: daphne filesharing.asgi:application --port $PORT --bind 0.0.0.0 -v2 
-release:
+
+  release:
   image: web
-  command:
+  command: 
     - python manage.py collectstatic --noinput
