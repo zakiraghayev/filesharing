@@ -2,7 +2,7 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: daphne filesharing.asgi:application --bind 0.0.0.0:$PORT
+  web: daphne -p 8000 -b 0.0.0.0 filesharing.asgi:application
 release:
   image: web
   command:

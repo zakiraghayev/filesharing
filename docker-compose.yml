@@ -16,7 +16,7 @@ services:
         - pgdata:/var/lib/postgresql/data/
   migration:
       build: .
-      command:  bash -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic --noinput"
+      command:  bash -c "python3 manage.py makemigrations && python3 manage.py migrate"
       depends_on: 
         - db
 
