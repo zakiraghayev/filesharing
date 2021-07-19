@@ -29,12 +29,12 @@ services:
       - db:db
       - redis:redis
 
-    
     volumes:
-      - /static:/static
+      - static:/static
       - media:/media
     env_file: .env
-    command:  daphne filesharing.asgi:application --bind 0.0.0.0:$PORT
+    # command:  daphne filesharing.asgi:application --bind 0.0.0.0:$PORT
+    command: python3 manage.py runserver 0.0.0.0:8000
 
     depends_on: 
       - migration
@@ -60,3 +60,4 @@ services:
 volumes:
   media:
   pgdata:
+  static:
